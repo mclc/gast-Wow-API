@@ -1,11 +1,14 @@
 <?php
+/**
+ * The main class to call the Wow API
+ * @author Erwan Guillon
+ * @copyright Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+ * @package gaston-Wow-API
+ * @subpackage mainclass
+ */
 
 include 'WowAPI.conf.php';
 
-/**
- * The main class to call the Wow API
- * @package gaston-Wow-API
- */
 class WowAPI
 {
     /**
@@ -225,7 +228,7 @@ class WowAPI
         $cache_file = GWA_CACHE_FOLDER . md5($url);
         $timedif = @(time() - filemtime($cache_file));
         
-        if (file_exists($cache_file) && $timedif < GWA_CACHE_TIME)
+        if (GWA_CACHE_TIME != 0 AND file_exists($cache_file) AND $timedif < GWA_CACHE_TIME)
         {
             return json_decode(file_get_contents($cache_file));
         }
@@ -270,7 +273,7 @@ class WowAPI
 
             curl_close($curl);
             
-            if( $response !== null )
+            if($response !== null AND GWA_CACHE_TIME != 0)
             {
                 if ($f = fopen($cache_file, 'w'))
                 {
