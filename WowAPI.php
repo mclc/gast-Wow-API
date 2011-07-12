@@ -70,7 +70,7 @@ class WowAPI
      * @return StdClass
      * @static
      */
-    public static function character($character_name, $region = 'eu', $realm = 'Medivh', $options = null)
+    public static function character($character_name, $region, $realm, $options = null)
     {
         if(!in_array($region, self::$_regions))
         {
@@ -113,7 +113,7 @@ class WowAPI
      * @return StdClass
      * @static
      */
-    public static function guild($guild_name, $region = 'eu', $realm = 'Medivh', $options = null)
+    public static function guild($guild_name, $region, $realm, $options = null)
     {
         if(!in_array($region, self::$_regions))
         {
@@ -154,7 +154,7 @@ class WowAPI
      * @return StdClass
      * @static
      */
-    public static function realm($region = 'eu', $realm = 'Medivh')
+    public static function realm($region, $realm)
     {
         if(!in_array($region, self::$_regions))
         {
