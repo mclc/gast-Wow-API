@@ -67,25 +67,31 @@ class WowAPI
      * @param string $character_name
      * @param string $region Must be a valid region
      * @param string $realm
-     * @param string|array $options Only string 'all' is accepted, if you want to pass one or more fields, use an array instead
+     * @param string|array $options Enter 'all' to have all options available or an array for a selection of multiple optional fields
      * @return StdClass
      * @static
      */
-    //TODO: if string, allow only one field
     public static function character($character_name, $region = 'eu', $realm = 'Medivh', $options = null)
     {
         if(!in_array($region, self::$_regions))
         {
-            return;
+            throw new Exception('The region ' . $region . ' does not exists.');
         }
         
         $url = "http://$region.battle.net/api/wow/character/$realm/$character_name";
         
         if($options != null)
         {
-            if($options == 'all')
+            if(is_string($options))
             {
-                $url .= "?fields=" . implode(',', self::$_character_fields);
+                if($options == 'all')
+                {
+                    $url .= '?fields=' . implode(',', self::$_character_fields);
+                }
+                else if(in_array($options, self::$_character_fields))
+                {
+                    $url .= '?fields=' . $options;
+                }
             }
             else if(is_array($options))
             {
@@ -104,25 +110,31 @@ class WowAPI
      * @param string $guild_name
      * @param string $region Must be a valid region
      * @param string $realm
-     * @param string|array $options Only string 'all' is accepted, if you want to pass one or more fields, use an array instead
+     * @param string|array $options Enter 'all' to have all options available or an array for a selection of multiple optional fields
      * @return StdClass
      * @static
      */
-    //TODO: if string, allow only one field
     public static function guild($guild_name, $region = 'eu', $realm = 'Medivh', $options = null)
     {
         if(!in_array($region, self::$_regions))
         {
-            return;
+            throw new Exception('The region ' . $region . ' does not exists.');
         }
         
         $url = "http://$region.battle.net/api/wow/guild/$realm/" . rawurlencode($guild_name);
         
         if($options != null)
         {
-            if($options == 'all')
+            if(is_string($options))
             {
-                $url .= "?fields=" . implode(',', self::$_guild_fields);
+                if($options == 'all')
+                {
+                    $url .= '?fields=' . implode(',', self::$_guild_fields);
+                }
+                else if(in_array($options, self::$_guild_fields))
+                {
+                    $url .= '?fields=' . $options;
+                }
             }
             else if(is_array($options))
             {
@@ -147,7 +159,7 @@ class WowAPI
     {
         if(!in_array($region, self::$_regions))
         {
-            return;
+            throw new Exception('The region ' . $region . ' does not exists.');
         }
         
         $url = "http://$region.battle.net/api/wow/realm/status";
@@ -196,7 +208,7 @@ class WowAPI
                 if(is_int($item_id)) $url .= 'item/' . $item_id;
                 else return;
                 break;
-            default: return; break;
+            default: throw new Exception('You must choose a data_type'); break;
         }
         
         return self::_call($url);
