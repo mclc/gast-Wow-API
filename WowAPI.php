@@ -2,7 +2,6 @@
 
 include 'WowAPI.conf.php';
 
-
 /**
  * The main class to call the Wow API
  * @package gaston-Wow-API
@@ -223,38 +222,63 @@ class WowAPI
      */
     private static function _call($url)
     {
-        //TODO: Implement cache function
-        $curl = curl_init();
+        $cache_file = GWA_CACHE_FOLDER . md5($url);
+        $timedif = @(time() - filemtime($cache_file));
         
-        //TODO: Check the API key if exists and pass it in headers https://github.com/Blizzard/BlizzardSDK-PHP/blob/master/blizzard/api/ApiAbstract.php line 341
-        $headers = array();
+        if (file_exists($cache_file) && $timedif < GWA_CACHE_TIME)
+        {
+            return json_decode(file_get_contents($cache_file));
+        }
+        else
+        {
+            $curl = curl_init();
         
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_AUTOREFERER => true,
-            CURLOPT_CONNECTTIMEOUT => 120,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTPGET => true,
-            CURLOPT_HTTPAUTH => CURLAUTH_ANY,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_USERAGENT => 'gast-wow-api'
-        ));
-        
-        $request = curl_exec($curl);
-        $headers = curl_getinfo($curl);
-        
-        if($headers['http_code'] != 404)
-            $response = json_decode($request);
-        else $response = null;
+            //TODO: Test with an API key but where to find it ;-)
+            $headers = array();
+            if(GWA_KEY_PRIVATE != '' AND GWA_KEY_PUBLIC != '');
+            {
+                $date = date(DATE_RFC2822);
+                $headers = array(
+                    'Date: '. $date,
+                    'Authorization: BNET '. GWA_KEY_PUBLIC .':'. base64_encode(hash_hmac('sha1', "GET\n{$date}\n{$url}\n", GWA_KEY_PRIVATE, true))
+                );
+            }
 
-        curl_close($curl);
-        
-        return $response;
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $url,
+                CURLOPT_HEADER => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_AUTOREFERER => true,
+                CURLOPT_CONNECTTIMEOUT => 120,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTPGET => true,
+                CURLOPT_HTTPAUTH => CURLAUTH_ANY,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_USERAGENT => 'gast-wow-api'
+            ));
+
+            $request = curl_exec($curl);
+            $headers = curl_getinfo($curl);
+
+            if($headers['http_code'] != 404)
+                $response = $request;
+            else $response = null;
+
+            curl_close($curl);
+            
+            if( $response !== null )
+            {
+                if ($f = fopen($cache_file, 'w'))
+                {
+                    fwrite ($f, $response, strlen($response));
+                    fclose($f);
+                }
+            }
+            return json_decode($response);
+        }
     }
 }

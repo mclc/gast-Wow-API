@@ -2,7 +2,7 @@
 
 include 'WowAPI.php';
 
-print_r(WowAPI::character('Gasba', 'eu', 'Medivh', 'all'));
+print_r(WowAPI::character('Mujadin', 'eu', 'Medivh'));
 //print_r(WowAPI::guild('La Waagh Retrouvée', 'eu', 'medivh', array('toto')));
 //print_r(WowAPI::realm('eu', 'Medivh'));
 //print_r(WowAPI::data('races'));
