@@ -44,7 +44,7 @@ Each function returns a stdClass object directly converted from json with json_d
 ### Realm ###
 
         $realm  = WowAPI::realm('eu', 'Medivh');
-        $realms = WowAPI::realm('eu', array('Medivh', 'Archimonde');
+        $realms = WowAPI::realm('eu', array('Medivh', 'Archimonde'));
 
 ### Data ressources ###
 
@@ -53,6 +53,27 @@ Each function returns a stdClass object directly converted from json with json_d
         $guild_rewards  = WowAPI::data('guildrewards');
         $guild_perks    = WowAPI::data('guildperks');
         $item           = WowAPI::data('item', 48652); // Not working yet du to blizzard service problem
+
+### What is send to you ? ###
+
+        WowAPI::character('Gasba', 'eu', 'Medivh')
+
+will generate a stdClass Object like this : 
+
+        stdClass Object
+        (
+            [lastModified] => 1311113533000
+            [name] => Gasba
+            [realm] => Medivh
+            [class] => 6
+            [race] => 5
+            [gender] => 1
+            [level] => 85
+            [achievementPoints] => 4710
+            [thumbnail] => medivh/187/25177787-avatar.jpg
+        )
+
+To see what blizzard sends to you, you have to print_r() the result.
 
 ## Todo ##
 

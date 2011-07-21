@@ -237,7 +237,7 @@ class WowAPI
             $curl = curl_init();
         
             //TODO: Test with an API key but where to find it ;-)
-            $headers = array();
+            /*$headers = null;
             if(GWA_KEY_PRIVATE != '' AND GWA_KEY_PUBLIC != '');
             {
                 $date = date(DATE_RFC2822);
@@ -245,9 +245,9 @@ class WowAPI
                     'Date: '. $date,
                     'Authorization: BNET '. GWA_KEY_PUBLIC .':'. base64_encode(hash_hmac('sha1', "GET\n{$date}\n{$url}\n", GWA_KEY_PRIVATE, true))
                 );
-            }
-
-            curl_setopt_array($curl, array(
+            }*/
+            
+            $curl_options = array(
                 CURLOPT_URL => $url,
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
@@ -258,11 +258,14 @@ class WowAPI
                 CURLOPT_HTTPGET => true,
                 CURLOPT_HTTPAUTH => CURLAUTH_ANY,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_HTTPHEADER => $headers,
                 CURLOPT_SSL_VERIFYHOST => false,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_USERAGENT => 'gast-wow-api'
-            ));
+            );
+            
+            //if($headers != null) $curl_options[CURLOPT_HTTPHEADER] = $headers;
+            
+            curl_setopt_array($curl, $curl_options);
 
             $request = curl_exec($curl);
             $headers = curl_getinfo($curl);
@@ -275,7 +278,7 @@ class WowAPI
             
             if($response !== null AND GWA_CACHE_TIME != 0)
             {
-                if ($f = fopen($cache_file, 'w'))
+                if ($f = @fopen($cache_file, 'w'))
                 {
                     fwrite ($f, $response, strlen($response));
                     fclose($f);
