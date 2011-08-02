@@ -217,18 +217,44 @@ class WowAPI
     }
     
     /**
+     * Return auction data
+     * @access public
+     * @param string $region Must be a valid region
+     * @param string $realm 
+     * @return StdClass
+     * @static
+     */
+    public static function auctions($region, $realm)
+    {
+        if(!in_array($region, self::$_regions))
+        {
+            throw new Exception('The region ' . $region . ' does not exists.');
+        }
+        
+        $url = "http://$region.battle.net/api/wow/auction/data/$realm";
+        
+        $auctions = self::_call($url, 0);
+        $auctions_url = current($auctions->files)->url;
+        
+        
+        
+        return self::_call($auctions_url);
+    }
+
+
+    /**
      * Manage the API call
      * @access private
      * @param string $url
      * @return StdClass
      * @static
      */
-    private static function _call($url)
+    private static function _call($url, $cache_time = GWA_CACHE_TIME)
     {
         $cache_file = GWA_CACHE_FOLDER . md5($url);
         $timedif = @(time() - filemtime($cache_file));
         
-        if (GWA_CACHE_TIME != 0 AND file_exists($cache_file) AND $timedif < GWA_CACHE_TIME)
+        if ($cache_time != 0 AND file_exists($cache_file) AND $timedif < $cache_time)
         {
             return json_decode(file_get_contents($cache_file));
         }

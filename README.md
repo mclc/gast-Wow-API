@@ -46,6 +46,10 @@ Each function returns a stdClass object directly converted from json with json_d
         $realm  = WowAPI::realm('eu', 'Medivh');
         $realms = WowAPI::realm('eu', array('Medivh', 'Archimonde'));
 
+### Auction data ###
+
+        $auctions = WowAPI::auctions('eu', 'Medivh');
+
 ### Data ressources ###
 
         $races          = WowAPI::data('races');
